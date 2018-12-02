@@ -14,25 +14,28 @@ import { LocalStorageStore, SessionStorageStore } from './web-storage'
 
 // Stores must implement asynchronous constructor, get(), set(), and remove()
 // methods.
-const DEFAULT_STORES = [CookieStore]
-if (window.indexedDB) {
-  DEFAULT_STORES.push(IndexedDbStore)
-}
-if (window.localStorage) {
-  DEFAULT_STORES.push(LocalStorageStore)
-}
-if (window.sessionStorage) {
-  DEFAULT_STORES.push(SessionStorageStore)
+const DEFAULT_STORES = []
+if (typeof window !== 'undefined') {
+  DEFAULT_STORES.push(CookieStore)
+  if (window.indexedDB) {
+    DEFAULT_STORES.push(IndexedDbStore)
+  }
+  if (window.localStorage) {
+    DEFAULT_STORES.push(LocalStorageStore)
+  }
+  if (window.sessionStorage) {
+    DEFAULT_STORES.push(SessionStorageStore)
+  }
 }
 
 const cl = console.log
 const DEFAULT_KEY_PREFIX = '_immortal|'
 
 function arrrayGet (arr, index, _default = null) {
-    if (index in arr) {
-        return arr[index]
-    }
-    return _default
+  if (index in arr) {
+    return arr[index]
+  }
+  return _default
 }
 
 function countUniques (iterable) {
@@ -72,12 +75,12 @@ class ImmortalStorage {
     // Initialize stores asynchronously.
     this.onReady = (async () => {
       this.stores = (await Promise.all(stores.map(async Store => {
-        try {
-          return await new Store()
-        } catch (err) {
-          // TODO(grun): Log (where?) that the <Store> constructor failed.
-          return null
-        }
+          try {
+            return await new Store()
+          } catch (err) {
+            // TODO(grun): Log (where?) that the <Store> constructor failed.
+            return null
+          }
       }))).filter(Boolean)
     })()
   }
